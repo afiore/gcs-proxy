@@ -7,7 +7,6 @@ import (
 
 //ObjectMetadata exposes key metadata for an object
 type ObjectMetadata interface {
-	Key() string
 	ContentType() string
 	Size() int64
 	Updated() time.Time

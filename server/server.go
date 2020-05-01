@@ -48,6 +48,7 @@ func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStor
 				return
 			}
 		}
+		http.Error(w, "Bad Gateway", http.StatusBadGateway)
 	}
 
 }

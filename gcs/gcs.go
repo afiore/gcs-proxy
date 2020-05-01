@@ -19,9 +19,6 @@ type object struct {
 	reader *storage.Reader
 }
 
-func (o object) Key() string {
-	return o.key
-}
 func (o object) ContentType() string {
 	return o.attrs.ContentType
 }
