@@ -15,7 +15,7 @@ type ObjectMetadata interface {
 
 //ObjectStoreOps exposes basic operations on objects
 type ObjectStoreOps interface {
-	GetMetadata(bucket, key string) (ObjectMetadata, error)
+	GetObjectMetadata(bucket, key string) (ObjectMetadata, error)
 	CopyObject(bucket, key string, w io.Writer) (int64, error)
 }
 

@@ -12,17 +12,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-type gcpStore struct {
-	saFilePath string
-	ctx        context.Context
-}
-
-//StoreOps implements basic storage operations on GCP storage
-func StoreOps(saFilePath string) store.ObjectStoreOps {
-	ctx := context.Background()
-	return &gcpStore{saFilePath: saFilePath, ctx: ctx}
-}
-
 //Object represents a GCP storage record
 type object struct {
 	key    string
@@ -41,6 +30,11 @@ func (o object) Size() int64 {
 }
 func (o object) Updated() time.Time {
 	return o.attrs.Updated
+}
+
+type gcpStore struct {
+	saFilePath string
+	ctx        context.Context
 }
 
 func (s *gcpStore) getObject(bucketName, objectKey string) (o *object, err error) {
@@ -66,7 +60,7 @@ func (s *gcpStore) getObject(bucketName, objectKey string) (o *object, err error
 	return &object{key: objectKey, attrs: attrs, reader: r}, nil
 }
 
-func (s *gcpStore) GetMetadata(bucketName, objectKey string) (store.ObjectMetadata, error) {
+func (s *gcpStore) GetObjectMetadata(bucketName, objectKey string) (store.ObjectMetadata, error) {
 	o, err := s.getObject(bucketName, objectKey)
 	if err != nil {
 		return nil, err
@@ -74,11 +68,18 @@ func (s *gcpStore) GetMetadata(bucketName, objectKey string) (store.ObjectMetada
 	return o, nil
 }
 
-func (s *gcpStore) CopyObject(bucketName, objectKey string, w io.Writer) (written int64, err error) {
-	o, err := s.getObject(bucketName, objectKey)
+func (s *gcpStore) CopyObject(bucket, key string, w io.Writer) (written int64, err error) {
+	o, err := s.getObject(bucket, key)
 	defer o.reader.Close()
 	if err != nil {
 		return 0, err
 	}
 	return io.Copy(w, o.reader)
+}
+
+//StoreOps implements basic storage operations on GCP storage
+func StoreOps(saFilePath string) (store store.ObjectStoreOps) {
+	ctx := context.Background()
+	store = &gcpStore{saFilePath: saFilePath, ctx: ctx}
+	return store
 }

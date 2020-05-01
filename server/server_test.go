@@ -1,6 +1,11 @@
 package server
 
-import "testing"
+import (
+	"io"
+	"testing"
+
+	"github.com/afiore/gcs-proxy/store"
+)
 
 func TestReplaceEmptyBase(t *testing.T) {
 	got := replaceEmptyBase("", "index.html")
@@ -17,5 +22,17 @@ func TestReplaceEmptyBase(t *testing.T) {
 	if got != "/foo/bar" {
 		t.Errorf("replaceEmptyBase('/foo/bar') = %s; want /foo/index.html", got)
 	}
+}
+
+type emptyBucketsStore struct{}
+
+func (s *emptyBucketsStore) GetObjectMetadata(bucket, key string) (store.ObjectMetadata, error) {
+	return nil, &store.ObjectNotFound{Bucket: bucket, Key: key}
+}
+func (s *emptyBucketsStore) CopyObject(bucket, key string, w io.Writer) (int64, error) {
+	return 0, &store.ObjectNotFound{Bucket: bucket, Key: key}
+}
+
+func TestObjectNotFound(t *testing.T) {
 
 }

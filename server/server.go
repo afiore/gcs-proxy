@@ -24,7 +24,7 @@ func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStor
 			}
 			log.Printf("Fetching key: %s from bucket %s", objectKey, bucketName)
 
-			meta, err := objStore.GetMetadata(bucketName, objectKey)
+			meta, err := objStore.GetObjectMetadata(bucketName, objectKey)
 
 			var objNotFoundErr *store.ObjectNotFound
 			if errors.As(err, &objNotFoundErr) {
