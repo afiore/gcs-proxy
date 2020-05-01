@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/afiore/gcs-proxy/gcs"
+	"github.com/afiore/gcs-proxy/store"
 )
 
 //ServeFromBuckets maps incoming requests to bucket objects defined in the supplied configuration
-func ServeFromBuckets(bucketByAlias map[string]string, gcpSaPath string, aliasIndexHTML bool) func(w http.ResponseWriter, r *http.Request) {
+func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStoreOps, aliasIndexHTML bool) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		for alias, bucketName := range bucketByAlias {
 			if !strings.HasPrefix(r.URL.Path, "/"+alias) {
@@ -24,10 +24,11 @@ func ServeFromBuckets(bucketByAlias map[string]string, gcpSaPath string, aliasIn
 			}
 			log.Printf("Fetching key: %s from bucket %s", objectKey, bucketName)
 
-			gcsObj, err := gcs.GetObject(gcpSaPath, bucketName, objectKey)
+			meta, err := objStore.GetMetadata(bucketName, objectKey)
 
-			var objNotFoundErr *gcs.ObjectNotFound
+			var objNotFoundErr *store.ObjectNotFound
 			if errors.As(err, &objNotFoundErr) {
+				log.Printf("key %s not found in bucket %s", objectKey, bucketName)
 				http.NotFound(w, r)
 				return
 			}
@@ -36,11 +37,11 @@ func ServeFromBuckets(bucketByAlias map[string]string, gcpSaPath string, aliasIn
 				return
 			}
 
-			for k, v := range objectHeaders(gcsObj) {
+			for k, v := range objectHeaders(meta) {
 				w.Header().Add(k, v)
 			}
 
-			_, err = gcsObj.Copy(w)
+			_, err = objStore.CopyObject(bucketName, objectKey, w)
 			if err != nil {
 				log.Fatal(err)
 			} else {
@@ -65,10 +66,10 @@ func replaceEmptyBase(key string, replacement string) string {
 	return key
 }
 
-func objectHeaders(o gcs.Object) map[string]string {
+func objectHeaders(o store.ObjectMetadata) map[string]string {
 	return map[string]string{
-		"Content-Type":   o.ContentType,
-		"Content-Length": fmt.Sprintf("%d", o.Size),
-		"Last-Modified":  o.Updated.Format(http.TimeFormat),
+		"Content-Type":   o.ContentType(),
+		"Content-Length": fmt.Sprintf("%d", o.Size()),
+		"Last-Modified":  o.Updated().Format(http.TimeFormat),
 	}
 }

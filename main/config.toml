@@ -1,0 +1,7 @@
+[Gcs]
+ServiceAccountFilePath = "/home/andrea/code/sa.js"
+Buckets = "loadballancer-test-bucket"
+
+[Web]
+Port = 9999
+AliasIndexHTML = true

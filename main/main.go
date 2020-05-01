@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/afiore/gcs-proxy/config"
+	"github.com/afiore/gcs-proxy/gcs"
 	"github.com/afiore/gcs-proxy/server"
 	"github.com/influxdata/toml"
 )
@@ -31,7 +32,8 @@ func main() {
 		log.Fatalf("Couldn't parse configuration file: %s", err)
 	}
 
-	http.HandleFunc("/", server.ServeFromBuckets(config.Gcs.Buckets, config.Gcs.ServiceAccountFilePath, config.Web.AliasIndexHTML))
-	log.Printf("Loading app with config: %-v", config)
+	store := gcs.StoreOps(config.Gcs.ServiceAccountFilePath)
+	http.HandleFunc("/", server.ServeFromBuckets(config.Gcs.Buckets, store, config.Web.AliasIndexHTML))
+	log.Printf("Loading server with config: %-v", config)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Web.Port), nil))
 }

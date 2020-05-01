@@ -3,66 +3,82 @@ package gcs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/afiore/gcs-proxy/store"
 	"google.golang.org/api/option"
 )
 
-//Object represents a GCP storage record
-type Object struct {
-	Key         string
-	ContentType string
-	Size        int64
-	Updated     time.Time
-	reader      *storage.Reader
+type gcpStore struct {
+	saFilePath string
+	ctx        context.Context
 }
 
-//Copy copies the object to a writer
-func (obj *Object) Copy(w io.Writer) (int64, error) {
-	defer obj.reader.Close()
-	return io.Copy(w, obj.reader)
-}
-
-//ObjectNotFound is the error value returned by GetObject when the supplied key is not found
-type ObjectNotFound struct {
-	Bucket string
-	Key    string
-}
-
-func (e *ObjectNotFound) Error() string { return e.Key + " not found in bucket " + e.Bucket }
-
-func toGCSObject(ctx context.Context, attr *storage.ObjectAttrs, obj *storage.ObjectHandle) Object {
-	reader, err := obj.NewReader(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return Object{Key: attr.Name, ContentType: attr.ContentType, Size: attr.Size, Updated: attr.Updated, reader: reader}
-}
-
-//GetObject fetches an object from a bucket
-func GetObject(jsonPath, bucketName, objectKey string) (Object, error) {
-	var gcsObj Object
+//StoreOps implements basic storage operations on GCP storage
+func StoreOps(saFilePath string) store.ObjectStoreOps {
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile(jsonPath))
+	return &gcpStore{saFilePath: saFilePath, ctx: ctx}
+}
+
+//Object represents a GCP storage record
+type object struct {
+	key    string
+	attrs  *storage.ObjectAttrs
+	reader *storage.Reader
+}
+
+func (o object) Key() string {
+	return o.key
+}
+func (o object) ContentType() string {
+	return o.attrs.ContentType
+}
+func (o object) Size() int64 {
+	return o.attrs.Size
+}
+func (o object) Updated() time.Time {
+	return o.attrs.Updated
+}
+
+func (s *gcpStore) getObject(bucketName, objectKey string) (o *object, err error) {
+	var attrs *storage.ObjectAttrs
+	client, err := storage.NewClient(s.ctx, option.WithCredentialsFile(s.saFilePath))
 	if err != nil {
 		log.Fatal(err)
 	}
 	bucket := client.Bucket(bucketName)
 	obj := bucket.Object(objectKey)
-	attrs, err := obj.Attrs(ctx)
+	attrs, err = obj.Attrs(s.ctx)
 
 	if errors.Is(err, storage.ErrObjectNotExist) {
-		return gcsObj, &ObjectNotFound{Bucket: bucketName, Key: objectKey}
-
+		return o, &store.ObjectNotFound{Bucket: bucketName, Key: objectKey}
 	}
 	if err != nil {
-		return gcsObj, fmt.Errorf("An error occurred while accessing object %s", err.Error())
+		return o, err
 	}
-	gcsObj = toGCSObject(ctx, attrs, obj)
+	r, err := obj.NewReader(s.ctx)
+	if err != nil {
+		return o, err
+	}
+	return &object{key: objectKey, attrs: attrs, reader: r}, nil
+}
 
-	return gcsObj, nil
+func (s *gcpStore) GetMetadata(bucketName, objectKey string) (store.ObjectMetadata, error) {
+	o, err := s.getObject(bucketName, objectKey)
+	if err != nil {
+		return nil, err
+	}
+	return o, nil
+}
+
+func (s *gcpStore) CopyObject(bucketName, objectKey string, w io.Writer) (written int64, err error) {
+	o, err := s.getObject(bucketName, objectKey)
+	defer o.reader.Close()
+	if err != nil {
+		return 0, err
+	}
+	return io.Copy(w, o.reader)
 }
