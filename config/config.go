@@ -11,6 +11,5 @@ type gcs struct {
 	Buckets                map[string]string
 }
 type web struct {
-	Port           int16
-	AliasIndexHTML bool
+	Port int16
 }

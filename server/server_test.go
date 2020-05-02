@@ -23,11 +23,6 @@ func TestReplaceEmptyBase(t *testing.T) {
 	if got != "/foo/bar/baz" {
 		t.Errorf("replaceEmptyBase('/foo/bar/baz') = %s; want /foo/bar/baz", got)
 	}
-
-	got = replaceEmptyBase("/foo/bar", "index.html")
-	if got != "/foo/bar" {
-		t.Errorf("replaceEmptyBase('/foo/bar') = %s; want /foo/index.html", got)
-	}
 }
 
 type emptyBucketsStore struct{}
@@ -47,7 +42,7 @@ func TestBucketNotFound(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	store := emptyBucketsStore{}
-	handler := http.HandlerFunc(ServeFromBuckets(map[string]string{}, &store, true))
+	handler := http.HandlerFunc(ServeFromBuckets(map[string]string{}, &store))
 	handler.ServeHTTP(w, r)
 
 	resp := w.Result()
@@ -67,7 +62,7 @@ func TestObjectNotFound(t *testing.T) {
 	store := emptyBucketsStore{}
 	handler := http.HandlerFunc(ServeFromBuckets(map[string]string{
 		"test-alias": "test-bucket",
-	}, &store, true))
+	}, &store))
 	handler.ServeHTTP(w, r)
 
 	resp := w.Result()
@@ -139,7 +134,7 @@ func TestObjectFoundInBucketAlias(t *testing.T) {
 	}
 
 	store := dummyObjectStore{byBucket: objectsByBucket}
-	handler := http.HandlerFunc(ServeFromBuckets(aliases, &store, true))
+	handler := http.HandlerFunc(ServeFromBuckets(aliases, &store))
 	handler.ServeHTTP(w, r)
 
 	resp := w.Result()

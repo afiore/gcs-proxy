@@ -33,7 +33,7 @@ func main() {
 	}
 
 	store := gcs.StoreOps(config.Gcs.ServiceAccountFilePath)
-	http.HandleFunc("/", server.ServeFromBuckets(config.Gcs.Buckets, store, config.Web.AliasIndexHTML))
+	http.HandleFunc("/", server.ServeFromBuckets(config.Gcs.Buckets, store))
 	log.Printf("Loading server with config: %-v", config)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Web.Port), nil))
 }

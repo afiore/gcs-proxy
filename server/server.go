@@ -11,7 +11,7 @@ import (
 )
 
 //ServeFromBuckets maps incoming requests to bucket objects defined in the supplied configuration
-func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStoreOps, aliasIndexHTML bool) func(w http.ResponseWriter, r *http.Request) {
+func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStoreOps) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		for alias, bucketName := range bucketByAlias {
 			if !strings.HasPrefix(r.URL.Path, "/"+alias) {
@@ -19,9 +19,6 @@ func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStor
 			}
 			objectKey := strings.Replace(r.URL.Path, fmt.Sprintf("/%s/", alias), "", 1)
 
-			if aliasIndexHTML {
-				objectKey = replaceEmptyBase(objectKey, "index.html")
-			}
 			log.Printf("Fetching key: %s from bucket %s", objectKey, bucketName)
 
 			meta, err := objStore.GetObjectMetadata(bucketName, objectKey)
