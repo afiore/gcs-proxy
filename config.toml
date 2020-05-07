@@ -4,4 +4,3 @@ Buckets = { "b1" = "loadballancer-test-bucket" }
 
 [Web]
 Port = 9999
-AliasIndexHTML = true
