@@ -11,10 +11,16 @@ enforcing authentication/authorisation. Hence I have resorted to writing a simpl
 
 ```bash
 # Build the executable
-cd main && go build . && cd .. && cp main/main gcs-proxy
+go build -o bin/gcs-proxy main/main.go
 
 # running supplying the configuration file as it's sole argument
-./gcs-proxy config.toml
+./bin/gcs-proxy config.toml
+
+# Build docker image
+docker build -t afiore/gcs-proxy:latest .
+
+# Run containerized gcs-proxy making sure you mount a volume with the .toml file e.g.
+docker run --rm --volume $(pwd):/tmp afiore/gcs-proxy:latest /tmp/config.toml
 ```
 
 ## Configuration
