@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gcs-proxy
+spec:
+  selector:
+    matchLabels:
+      app: gcs-proxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gcs-proxy
+    spec:
+      containers:
+        - name: gcs-proxy
+          image: afiore/gcs-proxy:latest
+          args:
+            - "/etc/gcs-proxy/config.toml"
+          ports:
+            - containerPort: 9999
+          volumeMounts:
+            - name: config-volume-1
+              mountPath: "/etc/gcs-proxy/sa.json"
+              subPath: "sa.json"
+              readOnly: true
+            - name: config-volume-2
+              mountPath: "/etc/gcs-proxy/config.toml"
+              subPath: "config.toml"
+              readOnly: true
+      volumes:
+        - name: config-volume-1
+          secret:
+            secretName: gcs-proxy
+            items:
+              - key: sa.json
+                path: sa.json
+        - name: config-volume-2
+          configMap:
+            name: gcs-proxy
+            items:
+              - key: config.toml
+                path: config.toml

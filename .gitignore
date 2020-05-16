@@ -2,3 +2,4 @@ sa.json
 gcs-proxy
 main/main
 config.toml
+k8s/sa-secret.yaml
