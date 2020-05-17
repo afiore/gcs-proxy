@@ -14,11 +14,11 @@ spec:
     spec:
       containers:
         - name: gcs-proxy
-          image: afiore/gcs-proxy:latest
+          image: {{ .Values.image.repository  }}
           args:
             - "/etc/gcs-proxy/config.toml"
           ports:
-            - containerPort: 9999
+            - containerPort: {{ .Values.gcs_proxy.port }}
           volumeMounts:
             - name: config-volume-1
               mountPath: "/etc/gcs-proxy/sa.json"

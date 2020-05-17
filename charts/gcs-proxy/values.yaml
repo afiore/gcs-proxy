@@ -1,0 +1,16 @@
+# Default values for gcs-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: afiore/gcs-proxy
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+gcs_proxy:
+  port: 8080
+  buckets:
+    b1:
+      loadballancer-test-bucket
