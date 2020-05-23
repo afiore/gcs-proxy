@@ -1,4 +1,5 @@
-sa.json
-gcs-proxy
-main/main
-config.toml
+/sa.json
+/gcs-proxy
+/main/main
+/config.toml
+/bin

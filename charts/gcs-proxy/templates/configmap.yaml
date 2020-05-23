@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  config.toml: |-
+    [Gcs]
+    ServiceAccountFilePath = "/etc/gcs-proxy/sa.json"
+    [Gcs.Buckets]
+    {{- range $k, $v := .Values.gcs_proxy.buckets }}
+      {{ $k }} = {{ $v | quote }}
+    {{- end }}
+
+    [Web]
+    Port = {{ .Values.gcs_proxy.port }}
+kind: ConfigMap
+metadata:
+  name: gcs-proxy

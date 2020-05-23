@@ -21,6 +21,10 @@ docker build -t afiore/gcs-proxy:latest .
 
 # Run containerized gcs-proxy making sure you mount a volume with the .toml file e.g.
 docker run --rm --volume $(pwd):/tmp afiore/gcs-proxy:latest /tmp/config.toml
+
+# supply your Google service account file and deploy the app through the provided Helm chart
+gcp_sa=$(cat /path/to/my/gcp_sa.json|base64 -w 0)
+helm install gcs-proxy ./charts/gcs-proxy --set gcp_sa_base64=$gcp_sa
 ```
 
 ## Configuration
@@ -34,7 +38,8 @@ This is the expected file structure:
 ServiceAccountFilePath = "/etc/gcs-proxy-sa.json"
 
 # A mapping from request path fragment to bucket name
-Buckets = { "bucket1" = "loadballancer-test-bucket" }
+[Gcs.Buckets] =
+"alias" = "my-bucket-name"
 
 [Web]
 # The port the app will be listening to
