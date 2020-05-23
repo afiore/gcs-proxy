@@ -12,5 +12,5 @@ image:
 gcs_proxy:
   port: 8080
   buckets:
-    b1:
-      loadballancer-test-bucket
+    lenses-core:
+      lenses-core-test-reports
