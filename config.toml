@@ -5,3 +5,16 @@ b1 = "loadballancer-test-bucket"
 
 [Web]
 Port = 9999
+[Web.Creds]
+Username = "antani"
+Password = "foo"
+
+[Web.OAuth]
+CallbackURL = "http://localhost:9999/auth/google/callback"
+ClientID = "814870887997-gl7evu1fli0q09bffqbbel02mr2dov5a.apps.googleusercontent.com"
+ClientSecret = "ec8sqbjtWbRXC0ftsSnUzlfA"
+AllowedHostDomains = [
+    "lenses.io",
+    "landoop.com"
+]
+SessionSecret = "de61db06-0a42-4817-aaca-55f05adb1900"
