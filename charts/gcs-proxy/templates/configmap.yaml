@@ -9,7 +9,17 @@ data:
     {{- end }}
 
     [Web]
-    Port = {{ .Values.gcs_proxy.port }}
+    Port = {{ .Values.gcs_proxy.port  }}
+    [Web.OAuth]
+    ClientID = {{ required "Expected a string value for '.Values.gcs_proxy.oauth.client_id'" .Values.gcs_proxy.oauth.client_id | quote }}
+    ClientSecret = {{ required "Expected a string value for '.Values.gcs_proxy.oauth.client_secret'"  .Values.gcs_proxy.oauth.client_secret | quote }}
+    SessionSecret = {{ required "Expected a string value for '.Values.gcs_proxy.oauth.session_secret'"  .Values.gcs_proxy.oauth.session_secret | quote }}
+    CallbackURL = {{ .Values.gcs_proxy.oauth.callback_url | quote }}
+    AllowedHostDomains = [
+    {{- range .Values.gcs_proxy.oauth.allowed_host_domains }}
+      {{ . | quote }},
+    {{- end }}
+    ]
 kind: ConfigMap
 metadata:
   name: gcs-proxy

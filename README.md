@@ -24,24 +24,10 @@ docker run --rm --volume $(pwd):/tmp afiore/gcs-proxy:latest /tmp/config.toml
 
 # supply your Google service account file and deploy the app through the provided Helm chart
 gcp_sa=$(cat /path/to/my/gcp_sa.json|base64 -w 0)
-helm install gcs-proxy ./charts/gcs-proxy --set gcp_sa_base64=$gcp_sa
+helm install gcs-proxy charts/gcs-proxy/ --set gcp_sa_base64=$gcp_sa --set gcs_proxy.oauth.client_id=$CLIENT_ID  --set gcs_proxy.oauth.client_secret=$CLIENT_SECRET --set gcs_proxy.oauth.session_secret=$SESSION_SECRET 
 ```
 
 ## Configuration
 
 The program expects a few mandatory configuration parameters to be supplied a `.toml` file.
-This is the expected file structure:
-
-```
-[Gcs]
-# Full path to the GCP Service account credentials
-ServiceAccountFilePath = "/etc/gcs-proxy-sa.json"
-
-# A mapping from request path fragment to bucket name
-[Gcs.Buckets] =
-"alias" = "my-bucket-name"
-
-[Web]
-# The port the app will be listening to
-Port = 9999
-```
+Please refer to `config.toml` for a sample of the available configurable parameters.
