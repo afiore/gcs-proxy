@@ -13,18 +13,6 @@ import (
 	"github.com/afiore/gcs-proxy/store"
 )
 
-func TestReplaceEmptyBase(t *testing.T) {
-	got := replaceEmptyBase("", "index.html")
-	if got != "" {
-		t.Errorf("replaceEmptyBase('') = %s; want ''", got)
-	}
-
-	got = replaceEmptyBase("/foo/bar/baz", "index.html")
-	if got != "/foo/bar/baz" {
-		t.Errorf("replaceEmptyBase('/foo/bar/baz') = %s; want /foo/bar/baz", got)
-	}
-}
-
 type emptyBucketsStore struct{}
 
 func (s *emptyBucketsStore) GetObjectMetadata(bucket, key string) (store.ObjectMetadata, error) {
@@ -149,6 +137,7 @@ func TestObjectFoundInBucketAlias(t *testing.T) {
 
 	var bytes []byte
 	bytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
 	content := string(bytes)
 	if content != dummyContent {
 		t.Errorf("Unexpected file content for /existing/key: %s", content)

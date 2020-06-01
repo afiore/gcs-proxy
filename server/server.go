@@ -55,15 +55,6 @@ func base(key string) string {
 	return parts[len(parts)-1]
 }
 
-func replaceEmptyBase(key string, replacement string) string {
-	if key != "" && base(key) == "" {
-		parts := strings.Split(key, "/")
-		return strings.Join(append(parts[:len(parts)-1], replacement), "/")
-
-	}
-	return key
-}
-
 func objectHeaders(o store.ObjectMetadata) map[string]string {
 	return map[string]string{
 		"Content-Type":   o.ContentType(),
