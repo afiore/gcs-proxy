@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# nameOverride: "gcs-proxy"
+# fullnameOverride: "gcs-proxy"
+# namespaceOverride: "gcs-proxy"
+
 replicaCount: 1
 
 image:
@@ -9,15 +13,20 @@ image:
   tag: "latest"
   pullPolicy: IfNotPresent
 
+ingress:
+  enabled: false
+  # specify the ingress host to bind your service to
+  # host:
+
 gcs_proxy:
   port: 8080
   oauth:
-    callback_url:
-       "http://localhost:9999/auth/google/callback"
+    callback_url: http://localhost:9999/auth/google/callback
     allowed_host_domains:
-    - "lenses.io"
-    - "landoop.com"
-    
+    - lenses.io
+    - landoop.com
+    - landoop.eu
+
   buckets:
     lenses-core:
       lenses-core-test-reports

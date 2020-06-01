@@ -1,0 +1,20 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: {{ include "gcs-proxy.namespace" . }}
+  name: {{ include "gcs-proxy.fullname" . }}
+  labels:
+{{ include "gcs-proxy.labels" . | indent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: {{ default .Values.ingress.class "traefik" }}
+spec:
+  rules:
+  - host: {{ required ".Values.ingress.host is required when ingres is enabled!" .Values.ingress.host }}
+    http:
+      paths:
+      - backend:
+          serviceName: gcs-proxy
+          servicePort: {{ .Values.gcs_proxy.port }}
+        path: /
+{{ end }}

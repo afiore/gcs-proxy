@@ -1,12 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gcs-proxy
+  namespace: {{ include "gcs-proxy.namespace" . }}
+  name: {{ include "gcs-proxy.fullname" . }}
+  labels:
+{{ include "gcs-proxy.labels" . | indent 4 }}
 spec:
-  type: LoadBalancer
   selector:
     app: gcs-proxy
   ports:
   - protocol: TCP
-    port: 80
-    targetPort: {{ .Values.gcs_proxy.port }}
+    port: {{ .Values.gcs_proxy.port }}
+    targetPort: http

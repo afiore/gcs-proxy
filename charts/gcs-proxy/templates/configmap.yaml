@@ -1,4 +1,10 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ include "gcs-proxy.namespace" . }}
+  name: {{ include "gcs-proxy.fullname" . }}
+  labels:
+{{ include "gcs-proxy.labels" . | indent 4 }}
 data:
   config.toml: |-
     [Gcs]
@@ -20,6 +26,3 @@ data:
       {{ . | quote }},
     {{- end }}
     ]
-kind: ConfigMap
-metadata:
-  name: gcs-proxy
