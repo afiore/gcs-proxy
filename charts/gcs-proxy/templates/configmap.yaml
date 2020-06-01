@@ -9,6 +9,7 @@ data:
     {{- end }}
 
     [Web]
+<<<<<<< HEAD
     Port = {{ .Values.gcs_proxy.port  }}
     [Web.OAuth]
     ClientID = {{ required "Expected a string value for '.Values.gcs_proxy.oauth.client_id'" .Values.gcs_proxy.oauth.client_id | quote }}
@@ -20,6 +21,9 @@ data:
       {{ . | quote }},
     {{- end }}
     ]
+=======
+    Port = {{ .Values.gcs_proxy.port }}
+>>>>>>> master
 kind: ConfigMap
 metadata:
   name: gcs-proxy

@@ -11,6 +11,7 @@ image:
 
 gcs_proxy:
   port: 8080
+<<<<<<< HEAD
   oauth:
     callback_url:
        "http://localhost:9999/auth/google/callback"
@@ -18,6 +19,8 @@ gcs_proxy:
     - "lenses.io"
     - "landoop.com"
     
+=======
+>>>>>>> master
   buckets:
     lenses-core:
       lenses-core-test-reports
