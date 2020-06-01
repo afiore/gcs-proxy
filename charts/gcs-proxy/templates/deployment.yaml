@@ -1,7 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gcs-proxy
+  namespace: {{ include "gcs-proxy.namespace" . }}
+  name: {{ include "gcs-proxy.fullname" . }}
+  labels:
+{{ include "gcs-proxy.labels" . | indent 4 }}
 spec:
   selector:
     matchLabels:
@@ -18,7 +21,9 @@ spec:
           args:
             - "/etc/gcs-proxy/config.toml"
           ports:
-            - containerPort: {{ .Values.gcs_proxy.port }}
+            - name: http
+              containerPort: {{ .Values.gcs_proxy.port }}
+              protocol: TCP
           volumeMounts:
             - name: config-volume-1
               mountPath: "/etc/gcs-proxy/sa.json"
@@ -31,13 +36,13 @@ spec:
       volumes:
         - name: config-volume-1
           secret:
-            secretName: gcs-proxy
+            secretName: {{ include "gcs-proxy.fullname" . }}
             items:
               - key: sa.json
                 path: sa.json
         - name: config-volume-2
           configMap:
-            name: gcs-proxy
+            name: {{ include "gcs-proxy.fullname" . }}
             items:
               - key: config.toml
                 path: config.toml
