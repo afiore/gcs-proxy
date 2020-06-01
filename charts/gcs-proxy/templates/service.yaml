@@ -2,13 +2,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: gcs-proxy
-  annotations:
-    kubernetes.io/ingress.global-static-ip-name: "gcs-proxy"
 spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: {{ .Values.gcs_proxy.port }}
+  type: LoadBalancer
   selector:
     app: gcs-proxy
-  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: {{ .Values.gcs_proxy.port }}

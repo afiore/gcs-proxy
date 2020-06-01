@@ -1,8 +1,0 @@
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: gcs-proxy-ingress
-spec:
-  backend:
-    serviceName: gcs-proxy
-    servicePort: 80
