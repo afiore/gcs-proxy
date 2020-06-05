@@ -10,6 +10,8 @@ import (
 	"github.com/afiore/gcs-proxy/store"
 )
 
+const welcomeMsg = "<p>You have reached an instance of <a href=\"https://github.com/afiore/gcs-proxy\">GCS Proxy</a></p>"
+
 //ServeFromBuckets maps incoming requests to bucket objects defined in the supplied configuration
 func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStoreOps) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +47,8 @@ func ServeFromBuckets(bucketByAlias map[string]string, objStore store.ObjectStor
 				return
 			}
 		}
-		http.Error(w, "Bad Gateway", http.StatusBadGateway)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		fmt.Fprint(w, welcomeMsg)
 	}
 
 }
