@@ -8,12 +8,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: gcs-proxy
+      app: {{ include "gcs-proxy.fullname" . }}
   replicas: 1
   template:
     metadata:
       labels:
-        app: gcs-proxy
+        app: {{ include "gcs-proxy.fullname" . }}
     spec:
       containers:
         - name: gcs-proxy

@@ -7,7 +7,7 @@ metadata:
 {{ include "gcs-proxy.labels" . | indent 4 }}
 spec:
   selector:
-    app: gcs-proxy
+    app: {{ include "gcs-proxy.fullname" . }}
   ports:
   - protocol: TCP
     port: {{ .Values.gcs_proxy.port }}
